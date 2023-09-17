@@ -7,7 +7,9 @@ use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthenticatController extends Controller
 {
@@ -15,7 +17,7 @@ class AuthenticatController extends Controller
     public function register(RegisterUserRequest $request)
     {
         try {
-            $user = User::create($request->all());
+            $user = User::create(array_merge($request->except('password'),['password'=>Hash::make($request->password)]));
             $token = $user->createToken('auth_token')->plainTextToken;
             return $this->returnData($user, true,200);
         
@@ -25,16 +27,21 @@ class AuthenticatController extends Controller
     }
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password')))
-        {
-            return $this->returnError(__('messages.Unauthorized'), 401);
-            
+       try{
+        $user = User::where('email', $request->email)->first();
+           
+        if (!$user || !Hash::check($request->password, $user->password)) {
+
+            return $this->returnError('Login invalid', 503);
+        } else {
+
+            $token = $user->createToken($request->email)->plainTextToken;
+
+            return $this->returnData($token, true, 200);
         }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return $this->returnData($token, true,200);
+       }catch(\Exception $e){
+        return $this->returnError($e->getMessage(), 500);
+       }
 
     }
 
@@ -51,5 +58,15 @@ class AuthenticatController extends Controller
         }
 
 
+    }
+
+    public function resetPassword()
+    {
+        try{
+            $personalAccessToken = PersonalAccessToken::findToken($request->token);
+            $user = $personalAccessToken->tokenable;
+        }catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), 500);
+        }
     }
 }

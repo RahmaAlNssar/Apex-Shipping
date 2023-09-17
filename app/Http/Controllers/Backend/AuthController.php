@@ -17,12 +17,12 @@ class AuthController extends Controller
         $validate = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
-            'device_token' => 'required',
+            
            
         ]);
         if ($validate) {
 
-            $admin = Admin::where('token', $request->device_token)->first();
+            $admin = Admin::where('email', $request->email)->first();
            
             if (!$admin || !Hash::check($request->password, $admin->password)) {
 
@@ -30,7 +30,7 @@ class AuthController extends Controller
             } else {
 
                
-                $token = $admin->createToken($request->device_token)->plainTextToken;
+                $token = $admin->createToken($request->email)->plainTextToken;
 
                 return $this->returnData($token, true, 200);
             }

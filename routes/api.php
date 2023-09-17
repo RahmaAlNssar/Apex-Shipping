@@ -30,7 +30,9 @@ Route::group(['middleware'=>['auth:admins'],'prefix'=>'admin'],function(){
 
 
 //routes user
-Route::post('user/login',[AuthenticatController::class, 'login']);
+Route::post('login',[AuthenticatController::class, 'login']);
+Route::post('register',[AuthenticatController::class, 'register']);
+
 Route::group(['middleware'=>['auth:users']],function(){
     Route::post('logout',[AuthenticatController::class, 'logout']);
 });
