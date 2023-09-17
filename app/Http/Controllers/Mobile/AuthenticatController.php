@@ -9,7 +9,10 @@ use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
+use Nette\Schema\Message;
 
 class AuthenticatController extends Controller
 {
@@ -60,13 +63,7 @@ class AuthenticatController extends Controller
 
     }
 
-    public function resetPassword()
-    {
-        try{
-            $personalAccessToken = PersonalAccessToken::findToken($request->token);
-            $user = $personalAccessToken->tokenable;
-        }catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), 500);
-        }
-    }
+
+
+
 }

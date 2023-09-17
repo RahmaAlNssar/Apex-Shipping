@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Mobile\AuthenticatController;
+use App\Http\Controllers\Mobile\ForgotPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -32,6 +34,9 @@ Route::group(['middleware'=>['auth:admins'],'prefix'=>'admin'],function(){
 //routes user
 Route::post('login',[AuthenticatController::class, 'login']);
 Route::post('register',[AuthenticatController::class, 'register']);
+Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm']); 
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm']);
+
 
 Route::group(['middleware'=>['auth:users']],function(){
     Route::post('logout',[AuthenticatController::class, 'logout']);
